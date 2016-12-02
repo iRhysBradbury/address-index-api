@@ -1,11 +1,15 @@
 package uk.gov.ons.addressIndex.crfscala
 
-import uk.gov.ons.addressIndex.crfscala.CrfScala.{CrfFeaturable, CrfJniInput, CrfType}
+import uk.gov.ons.addressIndex.crfscala.CrfScala._
 import uk.gov.ons.addressIndex.crfscala.jni.CrfScalaJni
 import scala.util.control.NonFatal
 
-//CrfToken type param should be actually two different inputs, a CrfToken or (CrfTokens, CrfToken) pair. will resolve later
-trait CrfJniInputResolvable[T, R, A <: CrfFeaturable[T, R]] {
+//Higher kinded type
+sealed trait AnalyserInput[T]
+object FeatureAnalyserInput extends AnalyserInput[CrfToken]
+object AggregateFeatureAnalyserInput extends AnalyserInput[(CrfTokens, CrfToken)]
+
+trait CrfJniInputResolvable[T, AI, AnalyserInput[AI], A <: CrfFeaturable[AI, AnalyserInput[AI]]] {
 
   /**
     * @return a function which returns an instance of T
@@ -18,11 +22,10 @@ trait CrfJniInputResolvable[T, R, A <: CrfFeaturable[T, R]] {
   def name(): String
 
   /**
-    * @param i input
+    * @param ai input
     * @return apply the analyser to i
     */
-  def analyse(i: R): T = analyser apply i
-
+  def analyse[AI](ai: AnalyserInput[AI]): AI = analyser apply(ai)
 
   //TODO scaladoc
   /**
@@ -32,20 +35,24 @@ trait CrfJniInputResolvable[T, R, A <: CrfFeaturable[T, R]] {
     * @param previous
     * @return
     */
-  def toCrfJniInput(input: R, next: Option[R] = None, previous: Option[R] = None): CrfJniInput = {
+  def toCrfJniInput[T](
+    input: AnalyserInput[T],
+    next: Option[AnalyserInput[T]] = None,
+    previous: Option[AnalyserInput[T]] = None
+  ): CrfJniInput = {
     new StringBuilder()
       .append(CrfScalaJni.lineStart)
       .append(
         createCrfJniInput(
           prefix = name,
-          someValue = analyse(input)
+          someValue = analyse[T](input)
         )
       )
       .append(
         next map { n =>
           createCrfJniInput(
             prefix = CrfScalaJni.next,
-            someValue = analyse(n)
+            someValue = analyse[T](n)
           )
         } getOrElse ""
       )
@@ -53,7 +60,7 @@ trait CrfJniInputResolvable[T, R, A <: CrfFeaturable[T, R]] {
         previous map { p =>
           createCrfJniInput(
             prefix = CrfScalaJni.previous,
-            someValue = analyse(p)
+            someValue = analyse[T](p)
           )
         } getOrElse ""
       )

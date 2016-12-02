@@ -16,7 +16,7 @@ object FeatureAnalysers {
   /**
     * @return all of the predefined features
     */
-  def allFeatures(): Features = {
+  def allFeatures(): Features[CrfToken, CrfTokens] = {
     Features(
       Feature[String](digits)(digitsAnalyser()),
       Feature[Root[_]](word)(wordAnalyser()),

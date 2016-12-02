@@ -4,7 +4,7 @@ import uk.gov.ons.addressIndex.crfscala.CrfScala._
 import uk.gov.ons.addressIndex.crfscala.jni.CrfScalaJni
 
 //TODO scaladoc
-trait CrfFeatures {
+trait CrfFeatures[CrfToken, CrfTokens] {
 
   /**
     * @return all the features
@@ -14,12 +14,12 @@ trait CrfFeatures {
   def aggregateFeatures: Seq[CrfAggregateFeature[_, (CrfTokens, CrfToken)]]
 
   //TODO scaladoc
-  def toCrfJniInput(input: CrfToken, next: Option[CrfToken] = None, previous: Option[CrfToken] = None, all: CrfTokens): CrfJniInput = {
+  def toCrfJniInput[T, CrfToken[]](input: CrfToken, next: Option[CrfToken] = None, previous: Option[CrfToken] = None, all: CrfTokens): CrfJniInput = {
     (
       (
         features
           map(
-            _.toCrfJniInput(
+            _.toCrfJniInput[CrfToken](
               input,
               next,
               previous
@@ -28,7 +28,7 @@ trait CrfFeatures {
       ) ++ (
         aggregateFeatures
           map(
-            _.toCrfJniInput(
+            _.toCrfJniInput[CrfToken](
               all -> input,
               next map(n => all -> n),
               previous map(p => all -> p)
