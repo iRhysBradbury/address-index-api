@@ -29,15 +29,15 @@ object Main extends App {
 
 //  val items = Source.fromFile(inputPath).mkString
   val token1 = "wd24"
-  val actual = FeatureAnalysers.allFeatures toCrfJniInput token1
-
-  println(actual)
-
-  val items : String = actual.replace("\n", "") + "\tsingleton:1.0\n"
-
-  println(items.replace("\n", "N").replace("\t", "T"))
-
-  val tags = new CrfScalaJniImpl().tag(modelPath, items)
-
-  println(tags)
+////  val actual = FeatureAnalysers.allFeatures toCrfJniInput token1
+//
+//  println(actual)
+//
+//  val items : String = actual.replace("\n", "") + "\tsingleton:1.0\n"
+//
+//  println(items.replace("\n", "N").replace("\t", "T"))
+//
+//  val tags = new CrfScalaJniImpl().tag(modelPath, items)
+//
+//  println(tags)
 }
