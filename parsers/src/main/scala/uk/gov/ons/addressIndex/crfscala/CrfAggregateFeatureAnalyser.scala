@@ -1,6 +1,6 @@
 package uk.gov.ons.addressIndex.crfscala
 
-import uk.gov.ons.addressIndex.crfscala.CrfScala.{CrfToken, CrfTokens}
+import uk.gov.ons.addressIndex.crfscala.CrfScala.{CrfFeaturable, CrfToken, CrfTokens}
 
 object CrfAggregateFeatureAnalyser {
 

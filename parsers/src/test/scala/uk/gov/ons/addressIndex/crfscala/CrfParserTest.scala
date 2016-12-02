@@ -36,8 +36,6 @@ class CrfParserTest extends FlatSpec with Matchers {
     val expected2prev = s"\tprevious\\:${feature1.name}\\:${token1.replace(":", "\\:")}:1.0\tprevious\\:${feature2.name}:1.0\tprevious\\:${feature3.name}:0.0\tprevious\\:${feature4.name}:0.0\n"
 
 
-
-
     val expected = s"\t${feature1.name}\\:${token1.replace(":", "\\:")}:1.0\t${feature2.name}:1.0\t${feature3.name}:0.0\t${feature4.name}:0.0\tnext\\:${feature1.name}\\:${token2.replace(":", "\\:")}:1.0\tnext\\:${feature2.name}:1.0\tnext\\:${feature3.name}:0.0\tnext\\:${feature4.name}:0.0\n"
 
     actual shouldBe expected

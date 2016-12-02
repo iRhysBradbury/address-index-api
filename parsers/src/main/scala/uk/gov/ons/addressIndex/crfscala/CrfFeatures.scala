@@ -15,7 +15,11 @@ trait CrfFeatures {
 
   //TODO scaladoc
   def toCrfJniInput(input: CrfToken, next: Option[CrfToken] = None, previous: Option[CrfToken] = None): CrfJniInput = {
-    (features map(_.toCrfJniInput(input, next, previous)) mkString) + CrfScalaJni.lineEnd
+    (
+      (features map(_.toCrfJniInput(input, next, previous))) ++
+      (aggregateFeatures map(_.toCrfJniInput(input, next, previous)))
+      mkString
+    ) + CrfScalaJni.lineEnd
   }
 
   /**

@@ -25,7 +25,9 @@ object CrfScala {
     def normalise(tokens : CrfTokens): CrfTokens
   }
 
-  trait CrfFeaturable
+  trait CrfFeaturable[T, R] {
+    def apply(i: R): T
+  }
 
   case class CrfTokenResult(
     token: CrfToken,
