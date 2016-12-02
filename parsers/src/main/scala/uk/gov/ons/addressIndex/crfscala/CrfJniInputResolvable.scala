@@ -42,18 +42,18 @@ trait CrfJniInputResolvable[T, R, A <: CrfFeaturable[T, R]] {
         )
       )
       .append(
-        next map { next =>
+        next map { n =>
           createCrfJniInput(
             prefix = CrfScalaJni.next,
-            someValue = analyse(next)
+            someValue = analyse(n)
           )
         } getOrElse ""
       )
       .append(
-        previous map { previous =>
+        previous map { p =>
           createCrfJniInput(
             prefix = CrfScalaJni.previous,
-            someValue = analyse(previous)
+            someValue = analyse(p)
           )
         } getOrElse ""
       )
