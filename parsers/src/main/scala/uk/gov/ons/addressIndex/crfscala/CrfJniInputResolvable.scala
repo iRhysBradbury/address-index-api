@@ -1,11 +1,11 @@
 package uk.gov.ons.addressIndex.crfscala
 
-import uk.gov.ons.addressIndex.crfscala.CrfScala.{CrfFeaturable, CrfJniInput, CrfToken, CrfType}
+import uk.gov.ons.addressIndex.crfscala.CrfScala.{CrfFeaturable, CrfJniInput, CrfType}
 import uk.gov.ons.addressIndex.crfscala.jni.CrfScalaJni
 import scala.util.control.NonFatal
 
 //CrfToken type param should be actually two different inputs, a CrfToken or (CrfTokens, CrfToken) pair. will resolve later
-trait CrfJniInputResolvable[T, A <: CrfFeaturable[T, CrfToken]] {
+trait CrfJniInputResolvable[T, R, A <: CrfFeaturable[T, R]] {
 
   /**
     * @return a function which returns an instance of T
@@ -21,7 +21,7 @@ trait CrfJniInputResolvable[T, A <: CrfFeaturable[T, CrfToken]] {
     * @param i input
     * @return apply the analyser to i
     */
-  def analyse(i: CrfToken): T = analyser apply i
+  def analyse(i: R): T = analyser apply i
 
 
   //TODO scaladoc
@@ -32,7 +32,7 @@ trait CrfJniInputResolvable[T, A <: CrfFeaturable[T, CrfToken]] {
     * @param previous
     * @return
     */
-  def toCrfJniInput(input: CrfToken, next: Option[CrfToken] = None, previous: Option[CrfToken] = None): CrfJniInput = {
+  def toCrfJniInput(input: R, next: Option[R] = None, previous: Option[R] = None): CrfJniInput = {
     new StringBuilder()
       .append(CrfScalaJni.lineStart)
       .append(

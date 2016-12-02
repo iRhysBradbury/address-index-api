@@ -9,15 +9,32 @@ trait CrfFeatures {
   /**
     * @return all the features
     */
-  def features: Seq[CrfFeature[_]]
+  def features: Seq[CrfFeature[_, CrfToken]]
 
-  def aggregateFeatures: Seq[CrfAggregateFeature[_]]
+  def aggregateFeatures: Seq[CrfAggregateFeature[_, (CrfTokens, CrfToken)]]
 
   //TODO scaladoc
-  def toCrfJniInput(input: CrfToken, next: Option[CrfToken] = None, previous: Option[CrfToken] = None): CrfJniInput = {
+  def toCrfJniInput(input: CrfToken, next: Option[CrfToken] = None, previous: Option[CrfToken] = None, all: CrfTokens): CrfJniInput = {
     (
-      (features map(_.toCrfJniInput(input, next, previous))) ++
-      (aggregateFeatures map(_.toCrfJniInput(input, next, previous)))
+      (
+        features
+          map(
+            _.toCrfJniInput(
+              input,
+              next,
+              previous
+            )
+          )
+      ) ++ (
+        aggregateFeatures
+          map(
+            _.toCrfJniInput(
+              all -> input,
+              next map(n => all -> n),
+              previous map(p => all -> p)
+            )
+          )
+        )
       mkString
     ) + CrfScalaJni.lineEnd
   }
