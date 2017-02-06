@@ -1,10 +1,19 @@
 package uk.gov.ons.addressIndex.client
 
+import java.io.{File, FileReader}
+import java.nio.file.Files
+
+import akka.util.ByteString
+import play.api.libs.Files.TemporaryFile
+
 import scala.concurrent.{ExecutionContext, Future}
 import uk.gov.ons.addressIndex.model.{AddressIndexSearchRequest, AddressIndexUPRNRequest}
-import play.api.libs.ws.{WSClient, WSRequest, WSResponse}
-import uk.gov.ons.addressIndex.client.AddressIndexClientHelper.{AddressIndexServerHost, AddressQuery, UprnQuery}
+import play.api.libs.ws._
+import play.api.mvc.{AnyContent, Headers, Request}
+import uk.gov.ons.addressIndex.client.AddressIndexClientHelper.{AddressIndexServerHost, AddressQuery, Bulk, UprnQuery}
 import uk.gov.ons.addressIndex.model.server.response.AddressBySearchResponseContainer
+
+import scala.io.Source
 
 
 trait AddressIndexClient {
@@ -30,10 +39,7 @@ trait AddressIndexClient {
     */
   def addressQuery(request: AddressIndexSearchRequest)
                   (implicit ec: ExecutionContext): Future[AddressBySearchResponseContainer] = {
-    addressQueryWSRequest(request).get.map { x =>
-      println(x)
-      x.json.as[AddressBySearchResponseContainer]
-    }
+    addressQueryWSRequest(request).get.map(_.json.as[AddressBySearchResponseContainer])
   }
 
   /**
@@ -83,6 +89,34 @@ trait AddressIndexClient {
     UprnQuery(request.uprn.toString)
       .toReq
   }
+
+  def bulk3(bytes: akka.stream.scaladsl.Source[ByteString, _], headers: Headers): Future[WSResponse] = {
+    client
+      .url(s"${iHost.value}/bulk2")
+      .withBody(StreamedBody(bytes))
+      .withMethod("POST")
+      .withHeaders(headers.toSimpleMap.toSeq:_*)
+      .execute()
+  }
+
+  def bulk(file: File, headers: Headers): Future[WSResponse] = {
+    println("client bridge")
+    println(Files.readAllBytes(file.toPath).length)
+    println(file.toPath)
+
+    val x = client
+      .url(s"${iHost.value}/bulk")
+      .withBody(FileBody(file))
+      .withMethod("POST")
+      .withHeaders(headers.toSimpleMap.toSeq:_*)
+      .execute()
+
+    x
+//
+//    Bulk
+//      .toReq
+//      .withHeaders(headers.toSimpleMap.toSeq:_*)
+  }
 }
 
 object AddressIndexClientHelper {
@@ -117,5 +151,10 @@ object AddressIndexClientHelper {
   object AddressQuery extends AddressIndexPath(
     path = "/addresses",
     method = "GET"
+  )
+
+  object Bulk extends AddressIndexPath(
+    path = "/bulk",
+    method = "POST"
   )
 }
